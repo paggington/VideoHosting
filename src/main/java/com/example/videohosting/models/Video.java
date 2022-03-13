@@ -21,6 +21,8 @@ public class Video {
     private String videoName;
     private String username;
     private String dateOfPublication;
+    @Column(nullable = true)
+    private String previewDirectory;
     @OneToMany(fetch = FetchType.LAZY)
     private Set<Likee> likes;
 }

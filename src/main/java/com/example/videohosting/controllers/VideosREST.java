@@ -4,16 +4,16 @@ import com.example.videohosting.data.servicesImpl.VideosServiceImpl;
 import com.example.videohosting.data.servicesImpl.service_exceptions.VideoNotFoundException;
 import com.example.videohosting.files.FileReader;
 import com.example.videohosting.files.FileUpload;
+import com.example.videohosting.video_sampling.VideoFrameExtractor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -28,21 +28,20 @@ public class VideosREST {
     private FileReader fileReader=new FileReader();
     private FileUpload fileUpload=new FileUpload();
     @GetMapping
-    @ResponseBody
-    public ResponseEntity<?> getVideoByParams(@RequestParam("id") String id, HttpServletResponse response){
-        ResponseEntity<byte[]> result = null;
+
+    @Async
+    public ResponseEntity<Resource> getVideoByParams(@RequestParam("id") String id){
         try {
             Path path = Path.of(videosService.getVideo(UUID.fromString(id)).getFilepath());
             Resource resource=new UrlResource(path.toUri());
 
             if(resource.exists() || resource.isReadable()){
-                byte[] image = Files.readAllBytes(path);
 
-                response.setStatus(HttpStatus.OK.value());
-                HttpHeaders headers=new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-                headers.setContentLength(image.length);
-                return new ResponseEntity<byte[]>(image, headers, HttpStatus.OK);
+                return ResponseEntity.ok()
+                        .contentType(MediaTypeFactory
+                                .getMediaType(resource)
+                                .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                        .body(resource);
             }else{
                 throw new RuntimeException("Cannot read the file");
             }
@@ -52,6 +51,21 @@ public class VideosREST {
             e.printStackTrace();
         }
 
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @Async
+    @GetMapping("/preview")
+    public ResponseEntity<Resource> getPreview(@RequestParam("id")String id){
+        try{
+            Path path = Path.of(videosService.getVideo(UUID.fromString(id)).getFilepath());
+            Resource resource=new VideoFrameExtractor().getFirstFrame(path);
+            return ResponseEntity.ok().contentType(MediaTypeFactory
+                    .getMediaType(resource)
+                    .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                    .body(resource);
+        } catch (VideoNotFoundException e) {
+            e.printStackTrace();
+        }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

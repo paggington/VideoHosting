@@ -1,5 +1,6 @@
 package com.example.videohosting.video_sampling;
 
+import com.example.videohosting.files.DIRECTORY;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.api.JCodecException;
 import org.jcodec.common.model.ColorSpace;
@@ -7,31 +8,34 @@ import org.jcodec.common.model.Picture;
 import org.jcodec.scale.ColorUtil;
 import org.jcodec.scale.RgbToBgr;
 import org.jcodec.scale.Transform;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class VideoFrameExtractor {
-    public File getFirstFrame(Path path){
-        File file=new File(path.toUri());
+public class VideoFrameExtractor implements DIRECTORY {
+    public Resource getFirstFrame(Path path){
+        File file=new File(path.toAbsolutePath().normalize().toUri());
         if(file.exists()){
+
             try {
                 Picture frame= FrameGrab.getFrameFromFile(file,1);
-                File file_extracted=File.createTempFile("extr_1"+file.getName().replaceAll("(.+)\\..+", "$1"),".png");
+                File file_extracted=File.createTempFile("extr_1"+file.getName().replaceAll("[.]", ""),
+                        ".png", new File(DIR + "\\extracted"));
+
                 ImageIO.write(toBufferedImage8Bit(frame), "png", file_extracted);
-                return file_extracted;
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JCodecException e) {
+                System.out.println(file_extracted.getPath());
+                return new UrlResource(file_extracted.getPath());
+            } catch (IOException | JCodecException e) {
                 e.printStackTrace();
             }
         }
-        throw new RuntimeException("file is not readable");
+        return null;
     }
     private BufferedImage toBufferedImage8Bit(Picture src) {
         if (src.getColor() != ColorSpace.RGB) {
