@@ -18,12 +18,10 @@ import java.util.UUID;
 public class VideosServiceImpl{
     private final VideoRepository videoRepository;
 
-    public Video getVideo(UUID id) throws VideoNotFoundException {
-        Video video=videoRepository.getById(id);
-        if(video==null){
-            throw new VideoNotFoundException(id.toString());
-        }
-        return video;
+    public Video getVideo(UUID id){
+        return videoRepository.getById(id);
     }
-
+    public void saveVideo(Video video){
+        videoRepository.save(video);
+    }
 }
