@@ -19,8 +19,8 @@ public class ProfileImageGenerator implements DIRECTORY {
         graphics.setColor(Color.black);
 
         for (int i = 0; i < 10; i++) {
-            int x=getRandomNumber(0,100);
-            int y=getRandomNumber(0,100);
+            int x=getRandomNumber(1,99);
+            int y=getRandomNumber(1,99);
             int colorR=getRandomNumber(100,255);
             int colorG=getRandomNumber(100,255);
             int colorB=getRandomNumber(100,255);
