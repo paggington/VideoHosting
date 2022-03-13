@@ -30,7 +30,8 @@ public class VideoFrameExtractor implements DIRECTORY {
 
                 ImageIO.write(toBufferedImage8Bit(frame), "png", file_extracted);
                 System.out.println(file_extracted.getPath());
-                return new UrlResource(file_extracted.getPath());
+                Path path_resolved=Path.of(file_extracted.getPath()).toAbsolutePath().normalize();
+                return new UrlResource(path_resolved.toUri());
             } catch (IOException | JCodecException e) {
                 e.printStackTrace();
             }

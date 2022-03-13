@@ -17,27 +17,26 @@ import java.nio.file.Path;
 import java.util.UUID;
 
 
-public class FileReader implements DIRECTORY{
+public class FileReader implements DIRECTORY {
     @Autowired
     private VideosServiceImpl videosService;
     private String filePath;
-    public FileReader(){
+
+    public FileReader() {
     }
+
     public File getFileByItsNameAndAuthor(UUID id) throws VideoNotFoundException {
-        Video video=videosService.getVideo(id);
+        Video video = videosService.getVideo(id);
         return new File(Path.of(video.getFilepath()).normalize().toAbsolutePath().toUri());
     }
-    public Resource load(UUID id) throws MalformedURLException {
-        try {
-            Path path = Path.of(videosService.getVideo(id).getFilepath());
-            Resource resource=new UrlResource(path.toUri());
 
-            if(resource.exists() || resource.isReadable()){
-                return resource;
-            }else{
-                throw new RuntimeException("Cannot read the file");
-            }
-        } catch (VideoNotFoundException e) {
+    public Resource load(UUID id) throws MalformedURLException {
+        Path path = Path.of(videosService.getVideo(id).getFilepath());
+        Resource resource = new UrlResource(path.toUri());
+
+        if (resource.exists() || resource.isReadable()) {
+            return resource;
+        } else {
             throw new RuntimeException("Cannot read the file");
         }
     }
