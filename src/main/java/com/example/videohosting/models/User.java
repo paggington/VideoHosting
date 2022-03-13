@@ -25,6 +25,7 @@ public class User {
     private String email;
     private String password;
     private String dateOfRegistration;
+    private String profilePicture;
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Set<Comment> comments;
