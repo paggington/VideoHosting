@@ -76,10 +76,6 @@ public class MainWebSecurityConfig extends WebSecurityConfigurerAdapter {
         );
     }
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
-    }
 
     @Bean
     public CorsFilter corsFilter() {
