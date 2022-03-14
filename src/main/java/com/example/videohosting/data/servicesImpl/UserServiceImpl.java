@@ -1,6 +1,8 @@
 package com.example.videohosting.data.servicesImpl;
 
+import com.example.videohosting.data.repos.RoleRepository;
 import com.example.videohosting.data.repos.UserRepository;
+import com.example.videohosting.models.Role;
 import com.example.videohosting.models.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 @Service
 @Transactional
@@ -21,9 +24,12 @@ import java.util.Collection;
 @Slf4j
 public class UserServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     public void saveNewUser(User user){
+
         user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
         user.setNonLocked(true);
+        user.addRole(new Role("ROLE_USER"));
         userRepository.save(user);
     }
     @Override

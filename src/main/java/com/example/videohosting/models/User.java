@@ -26,14 +26,17 @@ public class User {
     private String password;
     private String dateOfRegistration;
     private String profilePicture;
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "comment_id")
     private Set<Comment> comments;
 
     private boolean isEnabled;
     private boolean isNonLocked;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     private Collection<Role> roles=new ArrayList<>();
 
+    public void addRole(Role role){
+        this.roles.add(role);
+    }
 }
