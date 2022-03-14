@@ -9,7 +9,7 @@ public class VideoHostingApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(VideoHostingApplication.class, args);
-        new ProfileImageGenerator().generateImage();
+        new ProfileImageGenerator().generateImage("Artem");
     }
 
 }
