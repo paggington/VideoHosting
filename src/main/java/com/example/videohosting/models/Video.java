@@ -1,9 +1,9 @@
 package com.example.videohosting.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -24,5 +24,8 @@ public class Video {
     @Column(nullable = true)
     private String previewDirectory;
     @OneToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Set<Likee> likes;
+    private Long views=0L;
 }
+//TODO:make APi to return evrth ex set Likes

@@ -1,32 +1,43 @@
 package com.example.videohosting.controllers;
 
+import com.example.videohosting.data.servicesImpl.UserServiceImpl;
 import com.example.videohosting.data.servicesImpl.VideosServiceImpl;
 import com.example.videohosting.data.servicesImpl.service_exceptions.VideoNotFoundException;
 import com.example.videohosting.files.FileReader;
 import com.example.videohosting.files.FileUpload;
+import com.example.videohosting.models.Likee;
+import com.example.videohosting.models.User;
 import com.example.videohosting.models.Video;
 import com.example.videohosting.video_sampling.VideoFrameExtractor;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.Column;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/video")
 @RequiredArgsConstructor
 public class VideosREST {
     private final VideosServiceImpl videosService;
+    private final UserServiceImpl userService;
     private FileReader fileReader=new FileReader();
     private FileUpload fileUpload=new FileUpload();
     @GetMapping
@@ -83,5 +94,34 @@ public class VideosREST {
             }
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @Async
+    @GetMapping("/get-all-new")
+    public ResponseEntity<Page<Video>> getVideosForNonRegistered(
+            @RequestParam(value = "page",defaultValue = "0")int page,
+            @RequestParam(value = "size",defaultValue = "6")int size
+    ){
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(videosService.getAllVideosForNonRegistredUsers(page,size));
+    }
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    private static class VideoToSend{
+        private UUID id=UUID.randomUUID();
+        private String filepath;
+        private String videoName;
+        private String username;
+        private String dateOfPublication;
+        private String previewDirectory;
+        private Long likes;
+        private Long views;
+    }
+    private static class SortByDate implements Comparator<VideoToSend>{
+        @Override
+        public int compare(VideoToSend o1, VideoToSend o2) {
+            return o1.getDateOfPublication().compareTo(o2.getDateOfPublication());
+        }
     }
 }

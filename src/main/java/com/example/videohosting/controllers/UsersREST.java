@@ -10,15 +10,13 @@ import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
@@ -41,6 +39,18 @@ public class UsersREST {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @GetMapping("/all")
+    public ResponseEntity<List<User>> getAllUsers(){
+        return ResponseEntity.ok().body(userService.getAll());
+    }
+    @GetMapping("/user")
+    public ResponseEntity<User> getUserByUsername(@RequestParam("username")String username){
+        User user=userService.getUserByUsername(username);
+        if(user!=null){
+            return ResponseEntity.ok().body(user);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     @Getter
     @Setter
