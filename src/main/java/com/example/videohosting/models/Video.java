@@ -17,11 +17,13 @@ import java.util.UUID;
 public class Video {
     @Id
     private UUID id=UUID.randomUUID();
+    @JsonIgnore
     private String filepath;
     private String videoName;
     private String username;
     private String dateOfPublication;
     @Column(nullable = true)
+    @JsonIgnore
     private String previewDirectory;
     @OneToMany(fetch = FetchType.LAZY)
     @JsonIgnore
