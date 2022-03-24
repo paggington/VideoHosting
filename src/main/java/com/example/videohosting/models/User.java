@@ -34,13 +34,13 @@ public class User {
     @JoinColumn(name = "comment_id")
     @JsonIgnore
     private Set<Comment> comments;
-
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "view_id")
     private Set<View> viewed;
-    @JsonIgnore
+
     private boolean isEnabled;
-    @JsonIgnore
+
     private boolean isNonLocked;
     @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)

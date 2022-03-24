@@ -7,19 +7,24 @@ import com.example.videohosting.user_profile_pic_generator.ProfileImageGenerator
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.SneakyThrows;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.core.io.Resource;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UsersREST {
     private final UserServiceImpl userService;
@@ -39,6 +44,17 @@ public class UsersREST {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+    @GetMapping("/profile-picture")
+    public ResponseEntity<Resource> getProfilePicture(@RequestParam("username")String username){
+        Path path=Path.of(userService.getUserByUsername(username).getProfilePicture()).toAbsolutePath().normalize();
+        try {
+            Resource resource=new UrlResource(path.toUri());
+            return ResponseEntity.ok(resource);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     @GetMapping("/all")
     public ResponseEntity<List<User>> getAllUsers(){
