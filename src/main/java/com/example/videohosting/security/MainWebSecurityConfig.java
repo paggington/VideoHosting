@@ -60,7 +60,8 @@ public class MainWebSecurityConfig extends WebSecurityConfigurerAdapter {
                         }
                 )
                 .and();
-
+        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/video/get-all-new").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/video/preview").permitAll();
         http.authorizeRequests()
                 // Our public endpoints
                 .antMatchers("/api/login","/api/refresh").permitAll()
