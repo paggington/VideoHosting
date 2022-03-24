@@ -28,6 +28,7 @@ public class User {
     @JsonIgnore
     private String password;
     private String dateOfRegistration;
+    @JsonIgnore
     private String profilePicture;
 
     @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)

@@ -11,7 +11,9 @@ import lombok.SneakyThrows;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,11 +48,15 @@ public class UsersREST {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
     @GetMapping("/profile-picture")
-    public ResponseEntity<Resource> getProfilePicture(@RequestParam("username")String username){
-        Path path=Path.of(userService.getUserByUsername(username).getProfilePicture()).toAbsolutePath().normalize();
+    public ResponseEntity<Resource> getProfilePicture(){
+        Path path=Path.of(userService.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName())
+                .getProfilePicture()).toAbsolutePath().normalize();
         try {
             Resource resource=new UrlResource(path.toUri());
-            return ResponseEntity.ok(resource);
+            return ResponseEntity.ok().contentType(MediaTypeFactory
+                    .getMediaType(resource)
+                    .orElse(MediaType.APPLICATION_OCTET_STREAM))
+                    .body(resource);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -60,9 +66,9 @@ public class UsersREST {
     public ResponseEntity<List<User>> getAllUsers(){
         return ResponseEntity.ok().body(userService.getAll());
     }
-    @GetMapping("/user")
-    public ResponseEntity<User> getUserByUsername(@RequestParam("username")String username){
-        User user=userService.getUserByUsername(username);
+    @GetMapping("/current-user")
+    public ResponseEntity<User> getCurrentUser(){
+        User user=userService.getUserByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
         if(user!=null){
             return ResponseEntity.ok().body(user);
         }
