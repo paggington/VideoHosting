@@ -3,8 +3,6 @@ package com.example.videohosting.security;
 
 import com.example.videohosting.security.filters.AuthFilter;
 import com.example.videohosting.security.filters.AutzFilter;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,18 +20,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import javax.servlet.http.HttpServletResponse;
-
-import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
+
 @Configuration
 @EnableWebSecurity
-
-
 public class MainWebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    private  UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
     @Autowired
-    private  BCryptPasswordEncoder bCryptPasswordEncoder;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
@@ -41,7 +37,7 @@ public class MainWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        AuthFilter authFilter=new AuthFilter(authenticationManager());
+        AuthFilter authFilter = new AuthFilter(authenticationManager());
         authFilter.setFilterProcessesUrl("/api/login");
 
         http.cors().and().csrf().disable();
@@ -62,13 +58,14 @@ public class MainWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and();
         http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/video/get-all-new").permitAll();
         http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/video/preview").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/v1/video/video-new").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/v1/video/setView").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/api/v1/users/new").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.GET, "/api/v1/like/all").permitAll();
         http.authorizeRequests()
                 // Our public endpoints
-                .antMatchers("/api/login","/api/refresh").permitAll()
+                .antMatchers("/api/login", "/api/refresh").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/video").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/search").permitAll()
-                .antMatchers(HttpMethod.GET, "/api/book/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/book/search").permitAll()
                 // Our private endpoints
                 .anyRequest().authenticated();
         http.addFilterBefore(
@@ -90,6 +87,7 @@ public class MainWebSecurityConfig extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
     @Bean
     @Override
     public AuthenticationManager authenticationManager() throws Exception {
