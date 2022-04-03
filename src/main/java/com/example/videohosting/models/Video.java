@@ -20,12 +20,13 @@ public class Video {
     @JsonIgnore
     private String filepath;
     private String videoName;
+    private String videoDesc;
     private String username;
     private String dateOfPublication;
     @Column(nullable = true)
     @JsonIgnore
     private String previewDirectory;
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     private Set<Likee> likes;
     private Long views=0L;
