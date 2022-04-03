@@ -7,8 +7,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+
   main:
     allow-circular-references: true
-
+  servlet:
+    multipart:
+      max-file-size: 100000MB
+      max-request-size: 1000000MB
 
