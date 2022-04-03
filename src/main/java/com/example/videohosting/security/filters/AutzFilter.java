@@ -56,12 +56,12 @@ public class AutzFilter extends OncePerRequestFilter {
                     filterChain.doFilter(request, response);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    response.setHeader("error",e.getMessage());
+                    response.setHeader("error", e.getMessage());
                     response.setStatus(FORBIDDEN.value());
-                    Map<String,String> error=new HashMap<>();
-                    error.put("error_message",e.getMessage());
+                    Map<String, String> error = new HashMap<>();
+                    error.put("error_message", e.getMessage());
                     response.setContentType(APPLICATION_JSON_VALUE);
-                    new ObjectMapper().writeValue(response.getOutputStream(),error);
+                    new ObjectMapper().writeValue(response.getOutputStream(), error);
                 }
             } else {
                 filterChain.doFilter(request, response);
